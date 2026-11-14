@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bevölkerung / Deutschland</title>
+  <meta name="description" content="Interaktive Bevölkerungskarte der 15 größten Städte Deutschlands." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+
+  <!-- Tailwind-Utilities, fest kompiliert (nur die verwendeten Klassen, Tailwind v3-Werte) -->
+  <style>
+    /* --- Preflight (gekürzt) --- */
+    *, ::before, ::after { box-sizing: border-box; border: 0 solid #262626; }
+    html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+    body { margin: 0; line-height: inherit; }
+    h1, p, ol { margin: 0; padding: 0; }
+    h1 { font-size: inherit; font-weight: inherit; }
+    ol { list-style: none; }
+    button { font: inherit; color: inherit; background: transparent; padding: 0; cursor: pointer; }
+
+    /* --- Theme --- */
+    :root {
+      --void: #0A0A0A; --concrete: #141414; --ember: #C85A17;
+      --n100: #f5f5f5; --n300: #d4d4d4; --n500: #737373; --n600: #525252;
+      --n700: #404040; --n800: #262626; --n900: #171717;
+    }
+    html, body { background: var(--void); }
+
+    /* --- Layout --- */
+    .relative { position: relative; } .absolute { position: absolute; }
+    .inset-0 { inset: 0; } .top-0 { top: 0; } .left-0 { left: 0; } .right-0 { right: 0; } .bottom-0 { bottom: 0; }
+    .flex { display: flex; } .grid { display: grid; } .hidden { display: none; }
+    .flex-1 { flex: 1 1 0%; } .flex-col { flex-direction: column; }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .items-baseline { align-items: baseline; } .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
+    .gap-3 { gap: .75rem; } .gap-4 { gap: 1rem; }
+    .h-full { height: 100%; } .h-screen { height: 100vh; height: 100dvh; } .h-px { height: 1px; }
+    .w-screen { width: 100vw; } .w-80 { width: 20rem; } .w-5 { width: 1.25rem; } .max-w-xs { max-width: 20rem; }
+    .overflow-hidden { overflow: hidden; } .overflow-y-auto { overflow-y: auto; }
+    .pointer-events-none { pointer-events: none; } .select-none { user-select: none; }
+    .cursor-pointer { cursor: pointer; }
+
+    /* --- Spacing --- */
+    .p-6 { padding: 1.5rem; } .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .py-3 { padding-top: .75rem; padding-bottom: .75rem; } .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; } .pt-10 { padding-top: 2.5rem; } .pb-4 { padding-bottom: 1rem; }
+    .mb-4 { margin-bottom: 1rem; } .mt-1 { margin-top: .25rem; } .mt-2 { margin-top: .5rem; } .mt-6 { margin-top: 1.5rem; } .ml-8 { margin-left: 2rem; }
+
+    /* --- Borders & Backgrounds --- */
+    .border-t { border-top-width: 1px; } .border-b { border-bottom-width: 1px; }
+    .border-l { border-left-width: 1px; } .border-r { border-right-width: 1px; }
+    .border-neutral-800 { border-color: var(--n800); } .border-neutral-900 { border-color: var(--n900); }
+    .bg-void { background-color: var(--void); } .bg-void\/80 { background-color: rgb(10 10 10 / .8); }
+    .bg-neutral-700 { background-color: var(--n700); } .bg-neutral-900 { background-color: var(--n900); }
+    .backdrop-blur-sm { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+
+    /* --- Typography --- */
+    .font-sans { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
+    .font-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .font-medium { font-weight: 500; } .font-bold { font-weight: 700; }
+    .text-\[10px\] { font-size: 10px; } .text-\[11px\] { font-size: 11px; }
+    .text-xs { font-size: .75rem; line-height: 1rem; } .text-sm { font-size: .875rem; line-height: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; } .text-6xl { font-size: 3.75rem; line-height: 1; }
+    .leading-\[0\.82\] { line-height: .82; } .leading-relaxed { line-height: 1.625; }
+    .tracking-tighter { letter-spacing: -.05em; } .tracking-tight { letter-spacing: -.025em; }
+    .tracking-\[0\.2em\] { letter-spacing: .2em; } .tracking-\[0\.3em\] { letter-spacing: .3em; } .tracking-\[0\.35em\] { letter-spacing: .35em; }
+    .uppercase { text-transform: uppercase; } .tabular-nums { font-variant-numeric: tabular-nums; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .antialiased { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    .text-ember { color: var(--ember); } .text-neutral-100 { color: var(--n100); } .text-neutral-300 { color: var(--n300); }
+    .text-neutral-500 { color: var(--n500); } .text-neutral-600 { color: var(--n600); } .text-neutral-700 { color: var(--n700); }
+    .transition-colors { transition: color, background-color, border-color 150ms cubic-bezier(.4,0,.2,1); transition-property: color, background-color, border-color; transition-duration: 150ms; }
+
+    /* --- Responsive --- */
+    @media (min-width: 768px) {
+      .md\:p-10 { padding: 2.5rem; } .md\:px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+      .md\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; } .md\:text-8xl { font-size: 6rem; line-height: 1; }
+      .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) { .lg\:flex { display: flex; } .lg\:right-80 { right: 20rem; } }
+    @media (min-width: 1280px) { .xl\:text-9xl { font-size: 8rem; line-height: 1; } }
+
+    /* --- Komponenten --- */
+    .grid-bg {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+    .leading-tight-num { line-height: 1.1; }
+    .stat { border-color: var(--n800); }
+    .stat + .stat { border-left-width: 1px; }
+    @media (max-width: 767px) { .stat:nth-child(3) { border-left-width: 0; } .stat:nth-child(n+3) { border-top-width: 1px; } }
+
+    .city-row { position: relative; cursor: pointer; transition: background-color 150ms; }
+    .city-row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: transparent; transition: background-color 150ms; }
+    .city-row:hover, .city-row.is-active { background: var(--concrete); }
+    .city-row .city-name { color: var(--n300); transition: color 150ms; }
+    .city-row:hover .city-name, .city-row.is-active .city-name { color: #fff; }
+    .city-row .city-bar { background: var(--n700); transition: background-color 150ms; }
+    .city-row:hover .city-bar, .city-row.is-active .city-bar { background: var(--ember); }
+    .city-row.is-selected::before { background: var(--ember); }
+    .city-row.is-selected .city-name { color: #fff; }
+    .city-row.is-selected .city-bar { background: var(--ember); }
+    .city-row.is-selected .city-pop { color: var(--ember); }
+    .has-selection .city-row:not(.is-selected) .city-name { color: var(--n600); }
+
+    .chip { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+            border: 1px solid var(--n800); padding: .35rem .6rem; color: var(--n500); transition: color 150ms, border-color 150ms; }
+    .chip:hover { color: #fff; border-color: var(--ember); }
+    .chip[hidden] { display: none; }
+
+    ::selection { background: var(--ember); color: var(--void); }
+  </style>
+</head>
+<body class="bg-void text-neutral-300 font-sans antialiased overflow-hidden">
+
+  <div class="relative h-screen w-screen grid-bg">
+
+    <!-- KARTE: Full-Bleed im Zentrum -->
+    <div id="map" class="absolute inset-0"></div>
+
+    <!-- TITEL -->
+    <header class="absolute top-0 left-0 p-6 md:p-10 pointer-events-none select-none">
+      <p class="font-mono text-[11px] uppercase tracking-[0.35em] text-ember mb-4">DE / Einwohner / Großstädte</p>
+      <h1 class="text-6xl md:text-8xl xl:text-9xl font-bold tracking-tighter leading-[0.82] text-neutral-100">
+        Dichte<br /><span class="text-neutral-700">Masse.</span>
+      </h1>
+      <p class="mt-6 max-w-xs text-sm text-neutral-500 leading-relaxed">
+        Die 15 größten Städte Deutschlands. Fläche = Einwohner. Hover zeigt Details,
+        Klick wählt Städte aus und rechnet unten neu. <span class="text-neutral-600">Esc leert die Auswahl.</span>
+      </p>
+    </header>
+
+    <!-- INDEX -->
+    <aside id="index" class="hidden lg:flex absolute top-0 right-0 h-full w-80 flex-col border-l border-neutral-800 bg-void/80 backdrop-blur-sm">
+      <div class="px-6 pt-10 pb-4 border-b border-neutral-800 flex items-baseline justify-between gap-4">
+        <div>
+          <p class="font-mono text-[11px] uppercase tracking-[0.35em] text-neutral-600">Index</p>
+          <p class="mt-2 text-2xl font-bold tracking-tighter text-neutral-100">Top 15</p>
+        </div>
+        <button id="clearBtn" class="chip" hidden>Leeren ✕</button>
+      </div>
+      <ol id="cityList" class="flex-1 overflow-y-auto"></ol>
+      <div class="px-6 py-4 border-t border-neutral-800 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600 leading-relaxed">
+        Daten: ca.-Werte, gerundet<br />Destatis, Stand 31.12.2023
+      </div>
+    </aside>
+
+    <!-- KENNZAHLEN: rechnen sich bei Auswahl neu -->
+    <footer class="absolute bottom-0 left-0 lg:right-80 right-0 border-t border-neutral-800 grid grid-cols-2 md:grid-cols-4 bg-void/80 backdrop-blur-sm">
+      <div class="stat px-6 md:px-10 py-5">
+        <p id="lblPop" class="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 truncate">Summe Top 15</p>
+        <p id="statPop" class="mt-1 text-2xl md:text-3xl font-bold tracking-tighter text-neutral-100 tabular-nums leading-tight-num">—</p>
+      </div>
+      <div class="stat px-6 md:px-10 py-5">
+        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 truncate">Anteil an DE</p>
+        <p id="statShareDE" class="mt-1 text-2xl md:text-3xl font-bold tracking-tighter text-neutral-100 tabular-nums leading-tight-num">—</p>
+      </div>
+      <div class="stat px-6 md:px-10 py-5">
+        <p id="lblShare2" class="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 truncate">Anteil an Top 15</p>
+        <p id="statShare2" class="mt-1 text-2xl md:text-3xl font-bold tracking-tighter text-neutral-100 tabular-nums leading-tight-num">—</p>
+      </div>
+      <div class="stat px-6 md:px-10 py-5">
+        <p id="lblFocus" class="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 truncate">Auswahl</p>
+        <p id="statFocus" class="mt-1 text-2xl md:text-3xl font-bold tracking-tighter text-ember truncate leading-tight-num">Alle 15</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+/* ------------------------------------------------------------------
+ * Germany Population Map — Apache ECharts
+ * ------------------------------------------------------------------ */
+
+/* Bundesländer-Grenzen, eingebettet (Quelle: isellsoap/deutschlandGeoJSON,
+ * 4_niedrig, vereinfacht). Format: Name:Ring;Ring|… — Ring = x0,y0 in 1/100°,
+ * danach Deltas; 'h' markiert ein Loch (z. B. Berlin in Brandenburg). */
+const GEO_DATA = 'Baden-Württemberg:965,4978,-1,-9,8,3,2,-4,6,5,4,-3,4,-10,-5,-5,9,3,2,-10,8,0,5,6,6,-3,-3,-7,7,-5,-5,-1,4,-10,-4,-2,1,-6,13,-6,-5,-4,5,-1,0,-5,10,-1,11,-9,-5,-16,9,-9,-9,-2,3,3,-3,0,-6,-4,-8,5,4,-18,-28,-7,-7,-8,10,-9,7,-19,-6,-23,5,-5,-6,-3,5,-3,1,-8,-6,-4,-5,5,-6,-4,-12,3,-9,-7,-18,-2,-7,6,-18,3,-28,14,18,-15,-6,-2,-17,10,-5,-2,7,-3,-12,-4,-8,8,-4,-2,3,-4,-7,2,0,7,-16,4,-17,-13,23,-3,-4,-5,-7,4,-8,-7,-23,6,-12,-7,-15,-1,-12,5,-15,-6,-4,2,4,3,-6,-1,-8,8,3,22,6,9,-5,7,1,8,17,21,6,26,49,41,9,23,10,7,-4,3,6,11,-6,1,-2,14,16,-6,4,2,-3,6,10,2,3,-11,17,-1,-10,-9,6,-1,10,5,-1,5,18,1,-2,6,15,1,6,7,10,-1,1,6,-6,0,2,2,-8,1,1,3,19,2,6,-5,0,4,8,0|Bayern:1013,5055,20,-6,6,-10,22,-6,0,-10,11,-3,2,5,12,0,-14,7,11,7,11,0,6,-5,11,3,5,-4,-2,-4,11,-2,3,10,-3,11,10,4,8,0,-1,-7,10,-8,42,6,4,-8,15,-4,-4,-5,11,-6,0,-9,6,-5,29,-13,-8,-14,-7,-3,13,-7,6,-15,6,-1,1,-10,12,-8,25,-4,15,-17,22,-9,2,-8,8,-3,9,3,8,-9,8,0,9,-11,-5,-5,2,-13,-7,-6,-24,7,-6,-3,-3,-19,-12,-7,-42,-11,-12,-8,25,-27,-9,-12,17,-4,3,-5,-6,-5,0,-9,-8,-2,-17,8,3,6,-5,6,-17,0,-10,-5,-7,7,-18,-2,-1,6,-8,-4,4,-10,-57,0,-6,-9,-14,0,-5,-4,3,-2,-8,0,-7,-6,-5,0,3,5,-27,-4,-5,8,-7,0,6,4,-4,2,-11,-2,-17,5,-4,-3,-13,5,4,-16,-4,-5,-26,-11,6,12,-13,-3,-1,10,-9,3,-3,6,-10,-2,-7,7,-6,-6,-12,4,22,10,12,-3,6,4,5,-5,6,4,-1,8,-5,3,6,3,-5,5,6,23,-7,19,-10,9,7,8,28,7,-4,18,8,-5,6,4,3,0,-3,-3,9,2,-9,9,5,16,-11,9,-10,1,0,5,-5,1,5,4,-13,6,-1,6,4,2,-4,10,5,1,-7,5,3,7,-6,3,-11,-7,-4,11,-9,-3,5,6,-7,12,-15,-5,0,11,-9,-1,0,-4,-6,5,-13,-1,-7,-4,10,-1,1,-8,-10,1,-8,-8,-17,3,9,14,-4,1,3,4,-4,-1,-1,5,-5,1,-2,14,4,1,-8,5,4,6,11,2,3,-4,7,6,14,-2,4,-5,10,1,-2,15,16,-1,-1,4,9,4,1,11,21,0,17,13|Berlin:1316,5259,32,9,5,-4,-1,-5,14,-6,-4,-6,15,-3,-11,-10,-18,8,-5,-4,-18,4,-11,-3,-5,3,9,9,-6,1,4,7|Brandenburg:1388,5350,4,-8,32,1,0,-6,-14,-11,16,0,16,7,3,-7,-8,-8,0,-10,-23,-12,-2,-12,52,-26,-4,-5,3,-3,-10,-10,4,-11,13,-5,-3,-12,7,-5,-6,-16,-9,-7,15,-17,0,-7,-7,-5,-10,2,-23,-7,-19,5,-4,-7,-6,0,3,-3,-6,-8,-46,0,-14,8,-19,-5,-4,3,1,13,-14,9,14,7,-4,15,-11,0,-8,6,-29,8,-13,-3,-11,4,-22,15,8,5,-5,3,7,9,-4,7,6,7,-19,4,3,10,7,0,-4,9,5,8,-2,7,-39,4,0,5,-16,3,-5,6,-29,1,-8,5,27,2,3,9,26,1,-3,3,23,5,3,7,18,-2,21,-10,22,0,10,-7,21,2,-3,-3,3,-1,14,8,11,-3,7,7,11,-4,12,8,2,8,28,10,-5,1,1,5,9,-6;h1348,5268,-11,-6,-8,4,-7,-8,-8,0,-2,-6,6,-1,-8,-10,33,-3,5,4,18,-8,10,11,-14,2,4,6,-14,6,1,5,-5,4|Bremen:899,5313,-4,-1,4,-2,-5,-8,-21,2,-10,13,-14,6,50,-10|Hamburg:1007,5372,13,2,-6,-5,9,-6,-8,-7,18,-11,-8,-4,-20,6,-5,-4,-14,1,-14,13,4,7,7,-4,24,12|Hessen:950,5163,13,1,6,-6,-10,-6,6,-10,-9,-7,17,-5,4,4,-3,-2,-3,5,11,5,5,-4,-1,4,5,0,6,-13,27,-10,-3,-7,-8,2,5,-2,-3,-6,7,-3,-18,-1,-2,-4,5,-3,-12,0,11,-6,-11,-7,-8,-18,18,4,4,-5,-5,-2,0,-12,-7,-6,-21,-1,-2,-12,-9,-3,1,-4,-16,1,2,-15,-10,-1,-4,5,-14,2,-7,-6,-3,4,-12,-4,-3,-4,8,-5,-4,-1,2,-14,5,-1,1,-5,4,1,-3,-4,4,-1,-9,-13,6,-10,-18,-1,1,-5,-14,-6,1,8,7,3,-17,1,-3,11,-10,-2,3,-6,-7,-3,-17,10,-3,7,13,8,-6,0,-8,19,-7,6,-39,-5,-10,8,8,8,7,-3,-2,10,13,1,0,6,9,0,-6,10,-10,4,5,4,-2,8,15,2,-4,13,6,6,-5,5,15,9,10,-2,9,5,0,5,9,5,-4,3,2,6,20,1,-3,2,7,8,-3,5,-15,-1,-3,4,13,9,26,1,-5,9,8,3,12,-1,0,-6,12,2,15,13,-4,2,16,2|Mecklenburg-Vorpommern:1252,5448,44,-4,-52,-6,-8,-11,10,-2,-5,3,25,13,13,-1,2,-5,21,9,7,-7,2,-9,18,-4,6,-6,-3,-2,10,2,-4,-4,8,-5,24,8,11,-7,-7,-7,17,-11,-8,-5,11,4,-3,8,6,0,-1,-6,8,1,1,6,-8,6,-6,0,-5,-6,0,5,-9,-3,4,8,-6,6,5,2,7,-8,35,-17,-3,-1,3,-5,-41,-1,23,-10,24,-2,-6,-4,5,0,6,-8,-3,-8,12,-21,-16,-7,-16,0,14,11,0,6,-32,-1,-13,14,-1,-5,5,-1,-28,-10,-2,-8,-12,-8,-11,4,-7,-7,-11,3,-14,-8,-3,1,3,3,-21,-2,-10,7,-22,0,-21,10,-18,2,-11,-10,-20,-6,-11,3,-9,-4,3,-4,-4,-4,-15,-1,-20,3,1,4,-13,5,-8,11,-15,-3,-13,7,-11,-1,4,10,18,5,0,6,10,1,3,9,-19,7,-2,9,14,9,8,-2,-7,1,1,4,28,6,8,-3,0,-6,8,3,12,-6,2,7,-10,3,11,2,0,-5,14,12,-10,-2,15,8,41,3,4,-3,-3,3,24,12,18,18;1343,5469,-5,-5,4,-6,26,-2,-11,-10,20,-12,-4,-7,-8,3,5,3,-9,-1,7,3,-10,0,-23,-8,7,-1,-3,-4,-10,3,5,3,-20,0,5,2,-7,3,1,4,13,1,-11,5,12,5,-11,2,-2,5,17,-4,-1,4,7,3,-3,-3,4,1,3,-7,10,-1,-1,7,-13,7,-13,-6,4,9,-12,-9,9,10,18,3;1318,5449,5,-2,-11,-3,6,5;1314,5461,2,-3,-5,0,-5,-12,8,15|Niedersachsen:868,5389,20,-6,22,5,19,-1,26,-25,22,-5,-1,-5,10,-8,4,3,1,-4,7,0,7,4,13,-6,15,3,25,-7,13,1,13,-7,9,4,40,-29,13,2,14,-5,-8,-3,-1,-6,-19,-7,-28,4,-10,-6,-17,0,3,-13,12,-11,6,1,-5,-5,8,-8,-7,-3,14,-9,-9,-3,10,-11,-7,-3,3,-7,-10,-2,3,-5,-42,-5,10,-5,-5,-2,5,-3,-8,-6,0,-7,13,-14,-7,-2,3,-6,-29,3,-3,-7,-15,-4,-4,-5,-10,1,-12,-6,-8,4,1,-4,-5,4,-11,-5,3,-5,3,2,-4,-4,-17,5,9,7,-6,10,10,6,-6,6,-25,1,1,11,8,10,-13,-1,-6,12,-10,1,-2,14,-14,1,-3,7,6,-2,3,5,-11,5,15,12,-2,4,4,4,-5,2,-23,-11,-15,1,-1,10,-5,3,-14,-1,-8,-7,-13,1,1,-5,13,-4,1,-16,7,-2,-12,-8,-13,3,-7,-7,-23,-3,-8,5,12,3,1,5,-12,3,6,8,-3,3,6,0,-5,6,-22,3,-11,8,-2,-10,-29,-12,-23,-2,-4,5,5,9,-7,9,-6,-3,-24,4,-3,8,9,1,-5,2,2,6,31,-1,4,21,17,15,-3,12,6,8,-8,4,4,9,-25,3,3,17,10,0,-4,5,7,5,16,5,70,3,15,-15,-2,-5,-8,0,0,-4,18,-7,7,7,0,5,-9,0,4,9,25,-5,4,-3,-4,-3,5,2,-9,17,8,14,12,6;h852,5320,11,-3,10,-13,21,-2,4,3,-3,11,-43,4;676,5362,5,-2,-9,-2,3,-2,-12,4,13,2|Nordrhein-Westfalen:867,5253,7,-14,20,1,11,10,8,-1,-4,-13,-12,-8,11,-5,-3,-5,-6,2,3,-7,14,-1,2,-14,10,-1,6,-12,13,1,-9,-12,0,-9,7,0,-11,-4,4,-2,-15,-13,-12,-2,0,6,-7,2,-13,-4,5,-9,-33,-5,-6,-6,3,-3,14,2,4,-6,-7,-8,3,-2,-20,-1,-2,-6,4,-3,-9,-5,0,-5,-9,-5,-10,2,-15,-9,5,-5,-3,-4,-10,0,-8,8,0,7,-13,3,1,5,-5,1,-6,-2,3,-7,-11,-3,0,-5,-28,-5,-4,-8,-13,1,-28,-10,-6,-10,-12,2,6,-12,-17,-1,-3,4,-16,-5,-6,5,1,-6,-6,6,4,7,-5,4,-16,6,11,7,-11,0,-5,9,-16,9,11,5,1,7,-6,1,1,5,-13,0,-3,7,10,-2,20,12,-2,2,4,2,-10,-1,-1,7,15,15,-1,12,-13,9,3,5,-16,8,5,3,-4,6,20,2,-6,4,5,2,26,-8,-2,5,34,2,10,7,-14,7,7,8,11,1,12,10,30,3,29,12,2,10,11,-8,22,-3,5,-6,-6,0,3,-3,-6,-8,13,-4,-2,-4,-12,-3,3,-4,28,2,7,7,13,-3,12,8,-7,2,-1,16,-13,4,-1,5,13,-1,8,7,16,1|Rheinland-Pfalz:780,5094,5,-1,-1,-5,13,-3,0,-7,8,-8,7,0,6,-11,-4,-5,-13,-1,2,-8,-5,-4,10,-4,6,-10,-9,0,0,-6,-13,-1,2,-10,-7,3,-8,-8,10,-8,37,6,9,-7,8,-19,6,0,-13,-8,9,-24,6,-1,-6,-11,4,-3,-10,-6,-3,-14,-12,-13,-30,9,-27,-1,-14,5,-4,7,-14,0,-6,8,10,4,2,9,-15,6,5,4,-4,11,-5,-2,-19,8,-42,-13,-23,3,4,12,10,5,1,9,-22,3,-21,22,9,13,-2,5,11,3,2,5,12,0,-4,6,7,-5,16,5,3,-4,17,1,-6,12,12,-2,6,10,28,10,13,-1,4,8,28,5,0,5,11,3,-3,7,6,2|Saarland:704,4964,18,-7,5,2,4,-5,-5,-10,15,-6,-2,-9,-10,-4,7,-10,-16,-3,-10,3,-4,-4,-3,8,-11,3,-8,-1,-1,-6,-9,2,-20,26,-18,4,1,8,24,-3,43,12|Sachsen-Anhalt:1163,5302,22,-7,0,-5,39,-4,2,-7,-5,-8,4,-9,-7,0,-3,-10,19,-4,-6,-7,4,-7,-7,-9,5,-3,-8,-5,6,-7,27,-12,13,3,29,-8,8,-6,11,0,4,-15,-16,-8,-20,4,-63,-15,0,-4,-5,-3,4,-4,0,-9,-4,-1,6,-10,-3,-4,11,-8,-4,-6,5,0,-8,-9,-4,3,-17,-1,-14,9,-12,-2,-9,7,-20,0,0,8,-10,3,11,8,-8,9,-41,3,-4,12,-6,4,4,4,-22,2,-13,14,0,7,8,6,-5,3,5,2,-9,6,41,4,-3,5,10,2,-3,7,7,3,-10,11,9,3,-14,9,7,3,-8,8,5,5,-6,-1,-12,11,-3,13,17,0,10,6,28,-4,19,7,1,6,11,2|Sachsen:1288,5167,29,-7,6,-8,-4,-9,4,-3,19,5,14,-8,46,0,6,8,-3,3,6,0,4,7,19,-5,23,7,10,-2,2,5,5,-8,22,-7,8,-21,-23,-41,-20,3,4,7,-9,-1,4,7,-10,6,-10,-4,-11,4,-4,-8,15,-3,-3,-5,-41,-9,-11,-8,-30,-1,-8,-11,-9,4,-5,-6,-8,1,-5,-9,-17,1,-5,-10,-15,5,-12,-6,-19,0,-16,-12,-3,-10,-5,0,-9,14,-21,4,0,3,-9,6,8,4,-9,6,14,9,2,-8,13,2,-1,5,18,6,-10,6,6,3,-4,4,41,11,-20,16,-24,2,-7,21,4,1,0,9,-4,4,9,11,63,10|Schleswig-Holstein:1107,5454,16,-3,8,-11,-30,4,6,10;841,5504,3,-2,-9,-5,2,-7,6,-2,38,4,42,-6,5,-6,13,4,3,-5,17,9,-1,-5,24,-7,12,2,8,-11,-6,3,-5,-7,-21,-10,22,9,1,5,8,0,0,-12,-19,-8,36,-1,-7,-15,10,10,9,3,39,-13,22,7,20,1,-7,-4,3,-15,-34,-15,4,-5,9,-1,1,-7,7,-1,-8,2,-14,-9,2,-9,19,-7,-3,-9,-10,-1,0,-6,-18,-5,-6,-10,-41,16,-1,6,7,4,-9,6,4,6,-35,-15,-7,4,-4,-7,-5,1,-12,4,-26,25,-34,3,-13,12,17,4,-18,12,3,7,11,6,-10,-5,-27,5,3,5,8,0,-8,3,26,1,15,7,-4,5,-7,-6,-10,1,8,12,-8,1,1,5,-13,8,-10,16,-17,-4,-11,2,-3,-12,2,16,11,13;h971,5452,-16,-1,2,-3,14,4;869,5456,-2,-6,-8,1,10,5;854,5476,6,-4,-3,-4,-17,3,14,5;848,5448,5,-5,-6,-1,1,6;848,5459,2,-3,-4,0,2,3;836,5471,4,-10,-11,6,7,4|Thüringen:1077,5165,17,-4,-5,-3,6,-4,4,-12,41,-3,8,-9,-11,-8,10,-3,2,-9,18,1,9,-7,12,2,14,-9,17,1,4,-3,8,8,-5,1,4,6,17,-1,7,-9,8,0,5,-8,-41,-10,4,-4,-6,-3,9,-8,-17,-3,1,-6,-11,-2,-3,7,-4,0,-11,-8,9,-6,-10,-9,-35,-3,-10,8,1,7,-8,0,-10,-4,3,-11,-3,-10,-11,2,2,4,-5,4,-11,-3,-12,5,-16,-4,13,-11,-11,1,-1,-5,-11,2,-1,11,-22,6,-6,10,-20,8,-9,-5,0,9,5,1,-4,6,-18,-4,8,18,11,7,-11,6,12,0,-5,3,2,4,16,-2,-5,6,3,6,-5,2,8,-2,3,6,-27,11,-4,8,37,12,8,10,28,-4,-2,7,13,3';
+
+function decodeGeo(str) {
+  const features = str.split('|').map((part) => {
+    const i = part.indexOf(':');
+    const name = part.slice(0, i);
+    const polygons = [];
+    part.slice(i + 1).split(';').forEach((r) => {
+      const hole = r[0] === 'h';
+      const n = (hole ? r.slice(1) : r).split(',').map(Number);
+      let x = n[0], y = n[1];
+      const ring = [[x / 100, y / 100]];
+      for (let k = 2; k < n.length; k += 2) { x += n[k]; y += n[k + 1]; ring.push([x / 100, y / 100]); }
+      ring.push(ring[0]);
+      if (hole && polygons.length) polygons[polygons.length - 1].push(ring);
+      else polygons.push([ring]);
+    });
+    return { type: 'Feature', properties: { name }, geometry: { type: 'MultiPolygon', coordinates: polygons } };
+  });
+  return { type: 'FeatureCollection', features };
+}
+
+const COLORS = {
+  concrete: '#141414', concreteHover: '#1F1F1F', concreteSel: '#1C1410',
+  line: '#262626', lineHover: '#525252', ember: '#C85A17', emberHot: '#F07A2E',
+};
+
+const DE_TOTAL = 84_670_000; // Einwohner Deutschland, ca. Ende 2023
+
+/* Städte: Einwohner ca., gerundet (Destatis, Stand 31.12.2023) */
+const CITIES = [
+  { name: 'Berlin',     state: 'Berlin',              pop: 3_662_000, coord: [13.405, 52.520] },
+  { name: 'Hamburg',    state: 'Hamburg',             pop: 1_910_000, coord: [9.993, 53.551] },
+  { name: 'München',    state: 'Bayern',              pop: 1_510_000, coord: [11.582, 48.135] },
+  { name: 'Köln',       state: 'Nordrhein-Westfalen', pop: 1_087_000, coord: [6.960, 50.938] },
+  { name: 'Frankfurt',  state: 'Hessen',              pop:   776_000, coord: [8.682, 50.110] },
+  { name: 'Stuttgart',  state: 'Baden-Württemberg',   pop:   633_000, coord: [9.183, 48.776] },
+  { name: 'Düsseldorf', state: 'Nordrhein-Westfalen', pop:   631_000, coord: [6.773, 51.227] },
+  { name: 'Leipzig',    state: 'Sachsen',             pop:   616_000, coord: [12.374, 51.340] },
+  { name: 'Dortmund',   state: 'Nordrhein-Westfalen', pop:   595_000, coord: [7.466, 51.514] },
+  { name: 'Essen',      state: 'Nordrhein-Westfalen', pop:   585_000, coord: [7.012, 51.456] },
+  { name: 'Bremen',     state: 'Bremen',              pop:   577_000, coord: [8.807, 53.079] },
+  { name: 'Dresden',    state: 'Sachsen',             pop:   566_000, coord: [13.738, 51.050] },
+  { name: 'Hannover',   state: 'Niedersachsen',       pop:   548_000, coord: [9.732, 52.376] },
+  { name: 'Nürnberg',   state: 'Bayern',              pop:   526_000, coord: [11.077, 49.452] },
+  { name: 'Duisburg',   state: 'Nordrhein-Westfalen', pop:   504_000, coord: [6.762, 51.435] },
+];
+
+/* Bundesländer: Einwohner ca., gerundet (Stand 2023) */
+const STATES = {
+  'Baden-Württemberg': 11_280_000, 'Bayern': 13_370_000, 'Berlin': 3_760_000, 'Brandenburg': 2_570_000,
+  'Bremen': 700_000, 'Hamburg': 1_890_000, 'Hessen': 6_390_000, 'Mecklenburg-Vorpommern': 1_630_000,
+  'Niedersachsen': 8_140_000, 'Nordrhein-Westfalen': 18_140_000, 'Rheinland-Pfalz': 4_160_000, 'Saarland': 1_000_000,
+  'Sachsen': 4_090_000, 'Sachsen-Anhalt': 2_190_000, 'Schleswig-Holstein': 2_960_000, 'Thüringen': 2_130_000,
+};
+
+const fmt = (n) => Math.round(n).toLocaleString('de-DE');
+const fmtM = (n) => (n / 1e6).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Mio.';
+const fmtPct = (x) => x.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
+
+const TOP15 = CITIES.reduce((s, c) => s + c.pop, 0);
+const maxPop = Math.max(...CITIES.map((c) => c.pop));
+const symbolSize = (pop) => 10 + Math.sqrt(pop / maxPop) * 46; // Fläche ~ Einwohner
+
+const $ = (id) => document.getElementById(id);
+const ui = {
+  lblPop: $('lblPop'), statPop: $('statPop'), statShareDE: $('statShareDE'),
+  lblShare2: $('lblShare2'), statShare2: $('statShare2'),
+  lblFocus: $('lblFocus'), statFocus: $('statFocus'),
+  list: $('cityList'), index: $('index'), clearBtn: $('clearBtn'),
+};
+
+/* ---------- Auswahl-Zustand ---------- */
+const selected = new Set();
+
+/* Zahlen weich hochzählen statt springen */
+const tweens = new WeakMap();
+function animateTo(el, to, format) {
+  const from = tweens.get(el)?.value ?? to;
+  const start = performance.now(), dur = 450;
+  const state = { value: from };
+  tweens.set(el, state);
+  (function step(now) {
+    if (tweens.get(el) !== state) return;
+    const t = Math.min(1, (now - start) / dur);
+    const e = 1 - Math.pow(1 - t, 3);
+    state.value = from + (to - from) * e;
+    el.textContent = format(state.value);
+    if (t < 1) requestAnimationFrame(step);
+  })(start);
+}
+
+/* Kern der Neuberechnung */
+function computeStats() {
+  const picked = selected.size ? [...selected].map((i) => CITIES[i]) : CITIES;
+  const pop = picked.reduce((s, c) => s + c.pop, 0);
+  const states = [...new Set(picked.map((c) => c.state))];
+  const statesPop = states.reduce((s, n) => s + STATES[n], 0);
+  return { picked, pop, states, shareDE: (pop / DE_TOTAL) * 100, shareTop15: (pop / TOP15) * 100, shareStates: (pop / statesPop) * 100 };
+}
+
+function renderStats() {
+  const s = computeStats();
+  const n = selected.size;
+
+  ui.lblPop.textContent = n === 0 ? 'Summe Top 15' : n === 1 ? 'Einwohner' : `Summe ${n} Städte`;
+  animateTo(ui.statPop, s.pop, n === 1 ? fmt : fmtM);
+  animateTo(ui.statShareDE, s.shareDE, fmtPct);
+
+  if (n === 0) {
+    ui.lblShare2.textContent = 'Anteil an Top 15';
+    animateTo(ui.statShare2, 100, fmtPct);
+  } else if (s.states.length === 1) {
+    ui.lblShare2.textContent = `Anteil an ${s.states[0]}`;
+    animateTo(ui.statShare2, s.shareStates, fmtPct);
+  } else {
+    ui.lblShare2.textContent = `Anteil an ${s.states.length} Ländern`;
+    animateTo(ui.statShare2, s.shareStates, fmtPct);
+  }
+
+  ui.lblFocus.textContent = 'Auswahl';
+  ui.statFocus.textContent = n === 0 ? 'Alle 15' : n === 1 ? s.picked[0].name : s.picked.map((c) => c.name).join(' + ');
+  ui.statFocus.title = ui.statFocus.textContent;
+}
+
+function renderSelection() {
+  ui.index.classList.toggle('has-selection', selected.size > 0);
+  ui.clearBtn.hidden = selected.size === 0;
+  ui.list.querySelectorAll('.city-row').forEach((r) =>
+    r.classList.toggle('is-selected', selected.has(Number(r.dataset.idx)))
+  );
+  if (chart.getOption()) {
+    chart.setOption({ series: [{ id: 'states', data: stateData() }, { id: 'cities', data: cityData() }] });
+  }
+  renderStats();
+}
+
+function toggle(idx) {
+  selected.has(idx) ? selected.delete(idx) : selected.add(idx);
+  renderSelection();
+}
+function clearSelection() {
+  if (!selected.size) return;
+  selected.clear();
+  renderSelection();
+}
+
+/* ---------- Liste ---------- */
+ui.list.innerHTML = CITIES.map((c, i) => `
+  <li class="city-row px-6 py-3 border-b border-neutral-900" data-idx="${i}" role="button" tabindex="0" aria-label="${c.name} auswählen">
+    <div class="flex items-baseline justify-between gap-4">
+      <span class="flex items-baseline gap-3">
+        <span class="font-mono text-[10px] text-neutral-600 w-5">${String(i + 1).padStart(2, '0')}</span>
+        <span class="city-name text-sm font-medium tracking-tight">${c.name}</span>
+      </span>
+      <span class="city-pop font-mono text-xs text-neutral-500 tabular-nums">${fmt(c.pop)}</span>
+    </div>
+    <div class="mt-2 ml-8 h-px bg-neutral-900">
+      <div class="city-bar h-px" style="width:${(c.pop / maxPop) * 100}%"></div>
+    </div>
+  </li>`).join('');
+
+function setActiveRow(idx) {
+  ui.list.querySelectorAll('.city-row').forEach((r) => r.classList.toggle('is-active', Number(r.dataset.idx) === idx));
+}
+
+/* ---------- Karte ---------- */
+const chart = echarts.init($('map'), null, { renderer: 'canvas' });
+
+function mapBox() {
+  const W = window.innerWidth, H = window.innerHeight;
+  const lg = W >= 1024;
+  const box = { top: 32, bottom: W >= 768 ? 104 : 150, left: lg ? 220 : 16, right: lg ? 340 : 16 };
+  const w = W - box.left - box.right, h = H - box.top - box.bottom;
+  return { layoutCenter: [box.left + w / 2, box.top + h / 2], layoutSize: Math.max(200, Math.min(h, w * 1.35)) };
+}
+
+/* Bundesländer mit ausgewählten Städten leicht kupfern einfärben */
+function stateData() {
+  const active = new Set([...selected].map((i) => CITIES[i].state));
+  return Object.entries(STATES).map(([name, value]) => ({
+    name, value,
+    itemStyle: active.has(name) ? { areaColor: COLORS.concreteSel, borderColor: '#5A2A0C' } : undefined,
+  }));
+}
+
+function cityData() {
+  const any = selected.size > 0;
+  return CITIES.map((c, i) => {
+    const on = selected.has(i);
+    return {
+      name: c.name,
+      value: [...c.coord, c.pop],
+      itemStyle: on
+        ? { color: COLORS.emberHot, borderColor: '#FFFFFF', borderWidth: 1.5, shadowBlur: 36, shadowColor: 'rgba(240,122,46,0.95)' }
+        : any
+          ? { color: 'rgba(200, 90, 23, 0.28)', borderColor: 'rgba(240,122,46,0.35)', shadowBlur: 0 }
+          : undefined,
+      label: on ? { color: '#FFFFFF' } : undefined,
+    };
+  });
+}
+
+const tipHTML = (eyebrow, title, value, sub, hint) => `
+  <div style="font-family:'Space Grotesk',sans-serif;min-width:190px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:${COLORS.ember};margin-bottom:6px">${eyebrow}</div>
+    <div style="font-size:20px;font-weight:700;letter-spacing:-.04em;color:#F5F5F5;line-height:1">${title}</div>
+    <div style="height:1px;background:#262626;margin:10px 0"></div>
+    <div style="font-size:24px;font-weight:700;letter-spacing:-.04em;color:#F5F5F5;line-height:1">${value}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#737373;margin-top:6px">${sub}</div>
+    ${hint ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#525252;margin-top:10px">${hint}</div>` : ''}
+  </div>`;
+
+echarts.registerMap('germany', decodeGeo(GEO_DATA));
+
+chart.setOption({
+  backgroundColor: 'transparent',
+  animationDuration: 900,
+  tooltip: {
+    trigger: 'item',
+    appendTo: 'body', // liegt über Fußleiste & Index-Spalte
+    backgroundColor: '#141414', borderColor: '#333333', borderWidth: 1, borderRadius: 0,
+    padding: [14, 16], extraCssText: 'box-shadow:none;border-radius:0;', textStyle: { color: '#E5E5E5' },
+    formatter: (p) => {
+      if (p.seriesId === 'cities') {
+        const i = p.dataIndex, c = CITIES[i];
+        const share = fmtPct((c.pop / STATES[c.state]) * 100);
+        return tipHTML(`Stadt / #${String(i + 1).padStart(2, '0')}`, c.name, fmt(c.pop),
+          `Einwohner · ${share} von ${c.state}`, selected.has(i) ? 'Klick: abwählen' : 'Klick: auswählen');
+      }
+      const v = STATES[p.name];
+      return v ? tipHTML('Bundesland', p.name, fmt(v), `Einwohner · ${fmtPct((v / DE_TOTAL) * 100)} von DE`) : p.name;
+    },
+  },
+  geo: {
+    map: 'germany',
+    roam: true,
+    scaleLimit: { min: 0.8, max: 6 },
+    ...mapBox(),
+    aspectScale: 0.65, // korrigiert die Verzerrung bei ~51° N
+    selectedMode: false,
+    label: { show: false },
+    itemStyle: { areaColor: COLORS.concrete, borderColor: COLORS.line, borderWidth: 1 },
+    emphasis: { label: { show: false }, itemStyle: { areaColor: COLORS.concreteHover, borderColor: COLORS.lineHover, borderWidth: 1 } },
+  },
+  series: [
+    { id: 'states', type: 'map', geoIndex: 0, data: stateData() },
+    {
+      id: 'cities',
+      type: 'effectScatter',
+      coordinateSystem: 'geo',
+      data: cityData(),
+      symbolSize: (v) => symbolSize(v[2]),
+      cursor: 'pointer',
+      showEffectOn: 'render',
+      rippleEffect: { brushType: 'stroke', scale: 2.2, period: 5, number: 2 },
+      itemStyle: {
+        color: 'rgba(200, 90, 23, 0.85)', borderColor: COLORS.emberHot, borderWidth: 1,
+        shadowBlur: 24, shadowColor: 'rgba(200, 90, 23, 0.65)',
+      },
+      label: {
+        show: true, formatter: '{b}', position: 'right', distance: 8,
+        color: '#737373', fontFamily: 'JetBrains Mono', fontSize: 10,
+      },
+      labelLayout: { hideOverlap: true },
+      emphasis: {
+        scale: 1.25,
+        label: { color: '#FFFFFF', fontSize: 11 },
+        itemStyle: { color: COLORS.emberHot, shadowBlur: 40, shadowColor: 'rgba(240, 122, 46, 0.9)' },
+      },
+      zlevel: 2,
+    },
+  ],
+});
+
+/* ---------- Interaktion ---------- */
+let hoverName = null;
+chart.on('mouseover', (p) => {
+  if (p.seriesId === 'cities') {
+    setActiveRow(p.dataIndex);
+    hoverName = p.name;
+  } else if (p.seriesId === 'states' || p.componentType === 'geo') {
+    hoverName = p.name;
+  }
+  if (hoverName) { ui.lblFocus.textContent = 'Fokus'; ui.statFocus.textContent = hoverName; }
+});
+chart.on('mouseout', () => {
+  setActiveRow(-1);
+  hoverName = null;
+  renderStats();
+});
+
+// Klick auf Stadt → auswählen / abwählen; Klick ins Leere → Auswahl leeren
+chart.on('click', (p) => {
+  if (p.seriesId === 'cities') {
+    toggle(p.dataIndex);
+    chart.dispatchAction({ type: 'showTip', seriesIndex: 1, dataIndex: p.dataIndex });
+  }
+});
+chart.getZr().on('click', (e) => { if (!e.target) clearSelection(); });
+
+ui.list.addEventListener('click', (e) => {
+  const row = e.target.closest('.city-row');
+  if (row) toggle(Number(row.dataset.idx));
+});
+ui.list.addEventListener('keydown', (e) => {
+  const row = e.target.closest('.city-row');
+  if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(Number(row.dataset.idx)); }
+});
+ui.list.addEventListener('mouseover', (e) => {
+  const row = e.target.closest('.city-row');
+  if (!row) return;
+  const idx = Number(row.dataset.idx);
+  chart.dispatchAction({ type: 'downplay', seriesIndex: 1 });
+  chart.dispatchAction({ type: 'highlight', seriesIndex: 1, dataIndex: idx });
+  chart.dispatchAction({ type: 'showTip', seriesIndex: 1, dataIndex: idx });
+});
+ui.list.addEventListener('mouseleave', () => {
+  chart.dispatchAction({ type: 'downplay', seriesIndex: 1 });
+  chart.dispatchAction({ type: 'hideTip' });
+});
+ui.clearBtn.addEventListener('click', clearSelection);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSelection(); });
+
+window.addEventListener('resize', () => {
+  chart.resize();
+  chart.setOption({ geo: mapBox() });
+});
+
+renderSelection();
+</script>
+</body>
+</html>
