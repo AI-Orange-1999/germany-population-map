@@ -319,7 +319,7 @@
         </div>
         <div id="chartHeat" class="chart chart-mid" role="img" aria-label="Heatmap: durchschnittliches jährliches Wachstum je Jahrzehnt und Stadt"></div>
         <div class="legend-ramp" aria-hidden="true">
-          <span>−2 %</span><i></i><span>0</span><i class="pos"></i><span>+2 % p. a.</span>
+          <span>−1,2 %</span><i></i><span>0</span><i class="pos"></i><span>+1,2 % p. a.</span>
         </div>
       </article>
     </div>
@@ -814,7 +814,7 @@ const Story = (() => {
         markLine: i === 0 ? {
           silent: true, symbol: 'none',
           lineStyle: { color: '#525252', type: [4, 4], width: 1 },
-          label: { color: C.inkMuted, fontFamily: C.mono, fontSize: 10, position: 'insideEndTop', formatter: (p) => p.name },
+          label: { color: C.inkMuted, fontFamily: C.mono, fontSize: 10, position: 'end', formatter: (p) => p.name },
           data: [{ xAxis: 2011, name: "[ ZENSUS '11 ]" }, { xAxis: 2022, name: "[ ZENSUS '22 ]" }],
         } : undefined,
       };
@@ -824,7 +824,7 @@ const Story = (() => {
     line = echarts.init(document.getElementById('chartLine'));
     line.setOption({
       animationDuration: 1600, animationEasing: 'cubicOut',
-      grid: { left: 64, right: 96, top: 24, bottom: 36 },
+      grid: { left: 64, right: 96, top: 40, bottom: 36 },
       xAxis: { type: 'value', min: 1955, max: 2025, interval: 10, axisLabel: { ...axisLabel, formatter: (v) => String(v) },
                axisLine: { lineStyle: { color: C.axis } }, axisTick: { show: false }, splitLine: { show: false } },
       yAxis: { type: scale, min: scale === 'log' ? 400 : 0, logBase: 10, axisLabel: { ...axisLabel, formatter: fmtTsd },
@@ -900,8 +900,8 @@ const Story = (() => {
                axisLabel: { ...axisLabel }, splitArea: { show: false } },
       yAxis: { type: 'category', data: names, inverse: true, axisTick: { show: false }, axisLine: { show: false },
                axisLabel: { fontFamily: C.mono, fontSize: 10, color: (n) => (isSel(n) ? C.inkStrong : C.ink) } },
-      visualMap: { show: false, type: 'continuous', min: -2, max: 2, dimension: 2,
-                   inRange: { color: [C.cool, '#1E2A33', '#222222', '#3A2214', C.ember] } },
+      visualMap: { show: false, type: 'continuous', min: -1.2, max: 1.2, dimension: 2,
+                   inRange: { color: [C.cool, '#24435C', '#1E1E1E', '#6A3110', C.ember] } },
       tooltip: {
         ...tooltipBase, trigger: 'item',
         formatter: (p) => {
@@ -912,7 +912,7 @@ const Story = (() => {
       },
       series: [{
         type: 'heatmap',
-        data: heat.map((d) => ({ value: d, itemStyle: { opacity: sel && !isSel(names[d[1]]) ? 0.3 : 1 } })),
+        data: heat.map((d) => ({ value: d, itemStyle: { opacity: sel && !isSel(names[d[1]]) ? 0.45 : 1 } })),
         itemStyle: { borderColor: '#0A0A0A', borderWidth: 2 },
         label: { show: true, fontFamily: C.mono, fontSize: 9, color: '#D4D4D4',
                  formatter: (p) => (p.value[2] > 0 ? '+' : '') + p.value[2].toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) },
@@ -964,7 +964,8 @@ const Story = (() => {
         levels: [
           { itemStyle: { borderColor: '#0A0A0A', borderWidth: 0, gapWidth: 3 } },
           { itemStyle: { borderColor: '#262626', borderWidth: 1, gapWidth: 2, color: '#141414' },
-            upperLabel: { show: true, height: 22, color: '#A3A3A3', fontFamily: C.mono, fontSize: 10, padding: [0, 6] } },
+            upperLabel: { show: true, height: 22, color: '#A3A3A3', fontFamily: C.mono, fontSize: 10, padding: [0, 6],
+              formatter: (p) => p.name + '  ·  ' + fmtPct((p.value / DE_TOTAL) * 100) } },
           { itemStyle: { borderWidth: 0, gapWidth: 0 } },
         ],
         label: {
