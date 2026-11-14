@@ -116,12 +116,94 @@
     .chip:hover { color: #fff; border-color: var(--ember); }
     .chip[hidden] { display: none; }
 
+    /* --- Scroll-Story --- */
+    html { scroll-behavior: smooth; }
+    .scroll-cue {
+      position: absolute; left: 50%; bottom: 7.5rem; transform: translateX(-50%);
+      font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--n500); text-decoration: none; border: 1px solid var(--n800); background: rgb(10 10 10 / .8);
+      padding: .5rem .8rem; transition: color 150ms, border-color 150ms;
+    }
+    .scroll-cue:hover { color: #fff; border-color: var(--ember); }
+    .scroll-cue span { display: inline-block; animation: cue 1.6s ease-in-out infinite; }
+    @keyframes cue { 50% { transform: translateY(3px); } }
+    @media (min-width: 1024px) { .scroll-cue { left: calc((100% - 20rem) / 2); } }
+    @media (max-width: 767px) { .scroll-cue { bottom: 10rem; } }
+
+    .story { border-top: 1px solid var(--n800); padding: 0 0 0; }
+    .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--n600); }
+    .eyebrow.text-ember { color: var(--ember); }
+    .story-head { padding: 6rem 1.5rem 3rem; max-width: 80rem; }
+    .story-title { margin: 1rem 0 0; font-size: clamp(3rem, 9vw, 8rem); font-weight: 700; letter-spacing: -.05em; line-height: .85; color: var(--n100); }
+    .story-lead { margin-top: 1.75rem; max-width: 34rem; font-size: .95rem; line-height: 1.65; color: var(--n500); }
+
+    .pickbar {
+      position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 1rem;
+      padding: .75rem 1.5rem; border-top: 1px solid var(--n800); border-bottom: 1px solid var(--n800);
+      background: rgb(10 10 10 / .92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    .pickbar-label { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--n600); white-space: nowrap; }
+    .pickbar-chips { display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; flex: 1; }
+    .pickbar-chips::-webkit-scrollbar { display: none; }
+    .pick {
+      font-family: "JetBrains Mono", monospace; font-size: 11px; white-space: nowrap; color: var(--n500);
+      border: 1px solid var(--n800); padding: .3rem .55rem; transition: color 150ms, border-color 150ms, background-color 150ms;
+    }
+    .pick:hover { color: #fff; border-color: var(--n600); }
+    .pick.is-selected { color: var(--void); background: var(--ember); border-color: var(--ember); }
+
+    .panel { border-bottom: 1px solid var(--n800); padding: 3rem 1.5rem 2rem; }
+    .panel-grid { display: grid; grid-template-columns: 1fr; }
+    .panel-grid > .panel + .panel { border-top: 0; }
+    @media (min-width: 1024px) {
+      .story-head, .panel, .pickbar { padding-left: 2.5rem; padding-right: 2.5rem; }
+      .panel-grid { grid-template-columns: 1fr 1fr; }
+      .panel-grid > .panel:first-child { border-right: 1px solid var(--n800); }
+    }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.25rem; }
+    .panel-title { margin: .5rem 0 0; font-size: clamp(1.5rem, 2.6vw, 2.25rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--n100); }
+    .panel-note { margin-top: .6rem; font-size: .8rem; line-height: 1.5; color: var(--n500); max-width: 38rem; }
+    .chart { width: 100%; }
+    .chart-tall { height: min(68vh, 620px); min-height: 380px; }
+    .chart-mid { height: 520px; }
+
+    .seg { display: flex; border: 1px solid var(--n800); flex-shrink: 0; }
+    .seg-btn { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--n500); padding: .45rem .7rem; }
+    .seg-btn + .seg-btn { border-left: 1px solid var(--n800); }
+    .seg-btn.is-on { background: var(--n100); color: var(--void); }
+
+    .legend-ramp { display: flex; align-items: center; gap: .5rem; margin-top: .75rem; font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--n500); }
+    .legend-ramp i { display: block; width: 72px; height: 8px; background: linear-gradient(90deg, #3D8FD6, #222222); }
+    .legend-ramp i.pos { background: linear-gradient(90deg, #222222, #C85A17); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 700ms ease, transform 700ms ease; }
+    .reveal.is-in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+
+    .methods details summary { cursor: pointer; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--n300); }
+    .methods details summary:hover { color: var(--ember); }
+    .table-wrap { overflow-x: auto; margin-top: 1.25rem; }
+    #dataTable { border-collapse: collapse; width: 100%; font-family: "JetBrains Mono", monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
+    #dataTable th, #dataTable td { padding: .5rem .75rem; border-bottom: 1px solid var(--n900); text-align: right; white-space: nowrap; }
+    #dataTable th:first-child, #dataTable td:first-child { text-align: left; }
+    #dataTable th { color: var(--n600); font-weight: 400; text-transform: uppercase; letter-spacing: .15em; font-size: 10px; }
+    #dataTable td { color: var(--n300); }
+    .methods-grid { display: grid; gap: 2rem; margin-top: 2.5rem; }
+    @media (min-width: 768px) { .methods-grid { grid-template-columns: 1fr 1fr; } }
+    .methods-grid p:not(.eyebrow) { margin-top: .6rem; font-size: .85rem; line-height: 1.65; color: var(--n500); }
+    .methods a { color: var(--n300); text-decoration: underline; text-decoration-color: var(--ember); text-underline-offset: 3px; }
+    .methods a:hover { color: #fff; }
+    .story-foot { display: flex; justify-content: space-between; padding: 2rem 1.5rem 3rem; font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--n600); }
+    .story-foot a { color: var(--n500); text-decoration: none; }
+    .story-foot a:hover { color: var(--ember); }
+    @media (min-width: 1024px) { .story-foot { padding-left: 2.5rem; padding-right: 2.5rem; } }
+
     ::selection { background: var(--ember); color: var(--void); }
   </style>
 </head>
-<body class="bg-void text-neutral-300 font-sans antialiased overflow-hidden">
+<body class="bg-void text-neutral-300 font-sans antialiased">
 
-  <div class="relative h-screen w-screen grid-bg">
+  <section id="map-section" class="relative h-screen grid-bg overflow-hidden">
 
     <!-- KARTE: Full-Bleed im Zentrum -->
     <div id="map" class="absolute inset-0"></div>
@@ -134,7 +216,7 @@
       </h1>
       <p class="mt-6 max-w-xs text-sm text-neutral-500 leading-relaxed">
         Die 15 größten Städte Deutschlands. Fläche = Einwohner. Hover zeigt Details,
-        Klick wählt Städte aus und rechnet unten neu. <span class="text-neutral-600">Esc leert die Auswahl.</span>
+        Klick wählt Städte aus und rechnet unten neu – auch in den Grafiken weiter unten. <span class="text-neutral-600">Esc leert die Auswahl.</span>
       </p>
     </header>
 
@@ -149,7 +231,7 @@
       </div>
       <ol id="cityList" class="flex-1 overflow-y-auto"></ol>
       <div class="px-6 py-4 border-t border-neutral-800 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600 leading-relaxed">
-        Daten: ca.-Werte, gerundet<br />Destatis, Stand 31.12.2023
+        Destatis · Stand 31.12.2025<br />Basis Zensus 2022
       </div>
     </aside>
 
@@ -173,7 +255,121 @@
       </div>
     </footer>
 
-  </div>
+    <a href="#story" class="scroll-cue" aria-label="Zur Entwicklung scrollen">Entwicklung 1955–2025 <span aria-hidden="true">↓</span></a>
+  </section>
+
+  <!-- ============================================================
+       02 / ENTWICKLUNG — Scroll-Story
+       ============================================================ -->
+  <section id="story" class="story" aria-labelledby="storyTitle">
+
+    <header class="story-head">
+      <p class="eyebrow text-ember">02 / Entwicklung / 1955–2025</p>
+      <h2 id="storyTitle" class="story-title">Siebzig Jahre<br /><span class="text-neutral-700">Stadtbewegung.</span></h2>
+      <p class="story-lead">
+        Wie sind die 15 größten Städte gewachsen, geschrumpft, wieder gewachsen? Die Auswahl aus der Karte gilt auch hier:
+        ausgewählte Städte leuchten in allen Grafiken.
+      </p>
+    </header>
+
+    <!-- Auswahl-Leiste: gleiche Auswahl wie auf der Karte -->
+    <div class="pickbar" role="group" aria-label="Städte hervorheben">
+      <span class="pickbar-label">Hervorheben</span>
+      <div id="pickChips" class="pickbar-chips"></div>
+      <button id="pickClear" class="chip" hidden>Leeren ✕</button>
+    </div>
+
+    <!-- 01 — Linien: die lange Kurve -->
+    <article class="panel panel-wide" data-chart="line">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">01 / Die lange Kurve</p>
+          <h3 class="panel-title">Einwohner 1955–2025</h3>
+          <p class="panel-note">Lücken = Zensus-Korrektur. Die Reihen davor und danach sind nicht direkt vergleichbar.</p>
+        </div>
+        <div class="seg" role="group" aria-label="Skala">
+          <button class="seg-btn is-on" data-scale="value">Linear</button>
+          <button class="seg-btn" data-scale="log">Log</button>
+        </div>
+      </div>
+      <div id="chartLine" class="chart chart-tall" role="img" aria-label="Liniendiagramm: Einwohner der 15 größten Städte 1955 bis 2025"></div>
+    </article>
+
+    <div class="panel-grid">
+      <!-- 02 — Divergierende Balken -->
+      <article class="panel" data-chart="bars">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">02 / Gewinner &amp; Verlierer</p>
+            <h3 class="panel-title">Veränderung 2022 → 2025</h3>
+            <p class="panel-note">Einheitliche Basis Zensus 2022, ohne Zeitreihenbruch.</p>
+          </div>
+        </div>
+        <div id="chartBars" class="chart chart-mid" role="img" aria-label="Balkendiagramm: prozentuale Veränderung der Einwohnerzahl 2022 bis 2025"></div>
+      </article>
+
+      <!-- 03 — Heatmap -->
+      <article class="panel" data-chart="heat">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">03 / Fieberkurve</p>
+            <h3 class="panel-title">Wachstum je Jahrzehnt</h3>
+            <p class="panel-note">Durchschnitt in % pro Jahr. 2010er = 2011–2021 (Basis Zensus 2011), 2020er = 2022–2025.</p>
+          </div>
+        </div>
+        <div id="chartHeat" class="chart chart-mid" role="img" aria-label="Heatmap: durchschnittliches jährliches Wachstum je Jahrzehnt und Stadt"></div>
+        <div class="legend-ramp" aria-hidden="true">
+          <span>−2 %</span><i></i><span>0</span><i class="pos"></i><span>+2 % p. a.</span>
+        </div>
+      </article>
+    </div>
+
+    <!-- 04 — Treemap -->
+    <article class="panel panel-wide" data-chart="tree">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">04 / Föderales Gewicht</p>
+          <h3 class="panel-title">Bundesländer 2025: Metropole vs. übriges Land</h3>
+          <p class="panel-note">Fläche = Einwohner. Kupfer = Top-15-Stadt, Beton = Rest des Landes. Klick auf eine Stadt wählt sie aus.</p>
+        </div>
+      </div>
+      <div id="chartTree" class="chart chart-tall" role="img" aria-label="Treemap: Einwohner der Bundesländer 2025, aufgeteilt in Großstädte und übriges Land"></div>
+    </article>
+
+    <!-- Tabelle & Methodik -->
+    <article class="panel panel-wide methods">
+      <details>
+        <summary>Daten als Tabelle</summary>
+        <div class="table-wrap"><table id="dataTable"></table></div>
+      </details>
+      <div class="methods-grid">
+        <div>
+          <p class="eyebrow">Quellen</p>
+          <p>
+            Städte 1955–2025: Statistisches Bundesamt (Destatis), Datensatz zum
+            <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/bar-chart-race.html">Bar Chart Race der 15 größten Städte</a>.
+            Bundesländer &amp; Deutschland 2025:
+            <a href="https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung">Statistikportal des Bundes und der Länder</a>.
+            Grenzen: <a href="https://github.com/isellsoap/deutschlandGeoJSON">deutschlandGeoJSON</a>, vereinfacht.
+          </p>
+        </div>
+        <div>
+          <p class="eyebrow">Methodik</p>
+          <p>
+            Ab 2022 Fortschreibung auf Basis Zensus 2022, 2011–2021 auf Basis Zensus 2011, davor ältere Zählungen.
+            Nach jedem Zensus springen die Zahlen. Das ist eine Korrektur, kein echtes Wachstum oder Schrumpfen.
+            Sprünge in den 1970ern gehen vor allem auf Gebietsreformen zurück (z. B. Köln und Duisburg 1975).
+          </p>
+        </div>
+      </div>
+    </article>
+
+    <footer class="story-foot">
+      <span>Bevölkerung / Deutschland</span>
+      <a href="#map-section">↑ Zur Karte</a>
+    </footer>
+  </section>
+
 
   <script>
 /* ------------------------------------------------------------------
@@ -210,34 +406,68 @@ const COLORS = {
   line: '#262626', lineHover: '#525252', ember: '#C85A17', emberHot: '#F07A2E',
 };
 
-const DE_TOTAL = 84_670_000; // Einwohner Deutschland, ca. Ende 2023
+const DE_TOTAL = 83_467_117; // Deutschland, 31.12.2025 (Destatis, Basis Zensus 2022)
 
-/* Städte: Einwohner ca., gerundet (Destatis, Stand 31.12.2023) */
+/* Städte: Einwohner am 31.12.2025, Fortschreibung auf Basis Zensus 2022 (Destatis) */
 const CITIES = [
-  { name: 'Berlin',     state: 'Berlin',              pop: 3_662_000, coord: [13.405, 52.520] },
-  { name: 'Hamburg',    state: 'Hamburg',             pop: 1_910_000, coord: [9.993, 53.551] },
-  { name: 'München',    state: 'Bayern',              pop: 1_510_000, coord: [11.582, 48.135] },
-  { name: 'Köln',       state: 'Nordrhein-Westfalen', pop: 1_087_000, coord: [6.960, 50.938] },
-  { name: 'Frankfurt',  state: 'Hessen',              pop:   776_000, coord: [8.682, 50.110] },
-  { name: 'Stuttgart',  state: 'Baden-Württemberg',   pop:   633_000, coord: [9.183, 48.776] },
-  { name: 'Düsseldorf', state: 'Nordrhein-Westfalen', pop:   631_000, coord: [6.773, 51.227] },
-  { name: 'Leipzig',    state: 'Sachsen',             pop:   616_000, coord: [12.374, 51.340] },
-  { name: 'Dortmund',   state: 'Nordrhein-Westfalen', pop:   595_000, coord: [7.466, 51.514] },
-  { name: 'Essen',      state: 'Nordrhein-Westfalen', pop:   585_000, coord: [7.012, 51.456] },
-  { name: 'Bremen',     state: 'Bremen',              pop:   577_000, coord: [8.807, 53.079] },
-  { name: 'Dresden',    state: 'Sachsen',             pop:   566_000, coord: [13.738, 51.050] },
-  { name: 'Hannover',   state: 'Niedersachsen',       pop:   548_000, coord: [9.732, 52.376] },
-  { name: 'Nürnberg',   state: 'Bayern',              pop:   526_000, coord: [11.077, 49.452] },
-  { name: 'Duisburg',   state: 'Nordrhein-Westfalen', pop:   504_000, coord: [6.762, 51.435] },
+  { name: 'Berlin',     state: 'Berlin',              pop: 3_700_577, coord: [13.405, 52.520] },
+  { name: 'Hamburg',    state: 'Hamburg',             pop: 1_869_473, coord: [9.993, 53.551] },
+  { name: 'München',    state: 'Bayern',              pop: 1_505_036, coord: [11.582, 48.135] },
+  { name: 'Köln',       state: 'Nordrhein-Westfalen', pop: 1_025_523, coord: [6.960, 50.938] },
+  { name: 'Frankfurt',  state: 'Hessen',              pop:   760_656, coord: [8.682, 50.110] },
+  { name: 'Düsseldorf', state: 'Nordrhein-Westfalen', pop:   619_444, coord: [6.773, 51.227] },
+  { name: 'Leipzig',    state: 'Sachsen',             pop:   615_932, coord: [12.374, 51.340] },
+  { name: 'Stuttgart',  state: 'Baden-Württemberg',   pop:   609_365, coord: [9.183, 48.776] },
+  { name: 'Dortmund',   state: 'Nordrhein-Westfalen', pop:   600_880, coord: [7.466, 51.514] },
+  { name: 'Bremen',     state: 'Bremen',              pop:   588_413, coord: [8.807, 53.079] },
+  { name: 'Essen',      state: 'Nordrhein-Westfalen', pop:   573_618, coord: [7.012, 51.456] },
+  { name: 'Dresden',    state: 'Sachsen',             pop:   562_764, coord: [13.738, 51.050] },
+  { name: 'Nürnberg',   state: 'Bayern',              pop:   531_159, coord: [11.077, 49.452] },
+  { name: 'Hannover',   state: 'Niedersachsen',       pop:   522_803, coord: [9.732, 52.376] },
+  { name: 'Duisburg',   state: 'Nordrhein-Westfalen', pop:   500_810, coord: [6.762, 51.435] },
 ];
 
-/* Bundesländer: Einwohner ca., gerundet (Stand 2023) */
+/* Bundesländer: Einwohner 2025, Basis Zensus 2022 (Statistikportal des Bundes und der Länder) */
 const STATES = {
-  'Baden-Württemberg': 11_280_000, 'Bayern': 13_370_000, 'Berlin': 3_760_000, 'Brandenburg': 2_570_000,
-  'Bremen': 700_000, 'Hamburg': 1_890_000, 'Hessen': 6_390_000, 'Mecklenburg-Vorpommern': 1_630_000,
-  'Niedersachsen': 8_140_000, 'Nordrhein-Westfalen': 18_140_000, 'Rheinland-Pfalz': 4_160_000, 'Saarland': 1_000_000,
-  'Sachsen': 4_090_000, 'Sachsen-Anhalt': 2_190_000, 'Schleswig-Holstein': 2_960_000, 'Thüringen': 2_130_000,
+  'Baden-Württemberg': 11_238_761, 'Bayern': 13_245_503, 'Berlin': 3_700_577, 'Brandenburg': 2_551_889,
+  'Bremen': 706_915, 'Hamburg': 1_869_473, 'Hessen': 6_278_594, 'Mecklenburg-Vorpommern': 1_573_685,
+  'Niedersachsen': 8_000_826, 'Nordrhein-Westfalen': 17_986_214, 'Rheinland-Pfalz': 4_123_022, 'Saarland': 1_007_342,
+  'Sachsen': 4_026_599, 'Sachsen-Anhalt': 2_120_252, 'Schleswig-Holstein': 2_958_519, 'Thüringen': 2_078_946,
 };
+
+/* Zeitreihen der Städte (Destatis, Bar-Chart-Race-Daten „staedte1b15de1955b2025_z22“).
+ * Drei Segmente, weil Zensus-Korrekturen die Reihen brechen:
+ *   A: 1955–2010 in 5-Jahres-Schritten (Tsd.; ältere Zählungen/Zensus 1987 bzw. DDR-Register)
+ *   B: 2011, 2015, 2020, 2021 (Basis Zensus 2011)
+ *   C: 2022, 2023, 2024, 2025 (Basis Zensus 2022) */
+const YEARS_A = [1955,1960,1965,1970,1975,1980,1985,1990,1995,2000,2005,2010];
+const YEARS_B = [2011,2015,2020,2021];
+const YEARS_C = [2022,2023,2024,2025];
+const SERIES = {
+  'Berlin':     { a:[3343,3274,3275,3209,3083,3049,3076,3434,3471,3382,3395,3461], b:[3326,3520,3664,3677], c:[3633,3662,3685,3701] },
+  'Hamburg':    { a:[1764,1830,1857,1794,1717,1645,1580,1652,1708,1715,1744,1786], b:[1718,1787,1852,1854], c:[1833,1852,1863,1869] },
+  'München':    { a:[947,1079,1211,1312,1315,1299,1267,1229,1236,1210,1260,1353],   b:[1365,1450,1488,1488], c:[1491,1489,1505,1505] },
+  'Köln':       { a:[701,789,855,850,1014,977,916,954,966,963,983,1007],          b:[1014,1061,1083,1073], c:[1021,1024,1025,1026] },
+  'Frankfurt':  { a:[629,667,691,666,636,629,595,645,650,647,652,680],            b:[677,733,764,759],     c:[747,750,756,761] },
+  'Düsseldorf': { a:[634,695,700,661,664,590,562,576,571,569,575,589],            b:[590,612,621,619],     c:[614,616,619,619] },
+  'Leipzig':    { a:[614,590,596,584,567,562,554,511,471,493,503,523],            b:[510,560,597,602],     c:[604,608,612,616] },
+  'Stuttgart':  { a:[592,635,633,634,600,581,562,580,586,584,593,607],            b:[591,624,630,626],     c:[612,613,613,609] },
+  'Dortmund':   { a:[610,638,656,641,631,608,572,599,599,589,588,580],            b:[571,586,588,587],     c:[599,601,603,601] },
+  'Bremen':     { a:[500,557,592,593,573,555,526,551,549,539,547,547],            b:[544,557,567,563],     c:[577,584,586,588] },
+  'Essen':      { a:[682,727,727,696,678,648,620,627,615,595,585,575],            b:[566,583,582,579],     c:[572,574,575,574] },
+  'Dresden':    { a:[497,494,508,502,509,516,520,491,469,478,495,523],            b:[518,544,556,555],     c:[560,563,565,563] },
+  'Nürnberg':   { a:[411,452,472,478,499,484,465,494,492,488,499,506],            b:[490,510,516,511],     c:[524,527,530,531] },
+  'Hannover':   { a:[520,572,559,521,553,534,508,513,523,515,516,523],            b:[509,532,534,536],     c:[517,520,522,523] },
+  'Duisburg':   { a:[473,502,490,453,592,558,518,535,535,515,502,490],            b:[487,491,496,495],     c:[502,503,502,501] },
+};
+/* exakte Werte für die Wachstumsrechnung auf einheitlicher Basis */
+const EXACT = {
+  'Berlin':[3326002,3677472,3632853], 'Hamburg':[1718187,1853935,1832675], 'München':[1364920,1487708,1490516],
+  'Köln':[1013665,1073096,1021253], 'Frankfurt':[676533,759224,747389], 'Düsseldorf':[589649,619477,614399],
+  'Leipzig':[510043,601866,603578], 'Stuttgart':[591015,626275,612041], 'Dortmund':[571403,586852,599370],
+  'Bremen':[544043,563290,576947], 'Essen':[565900,579432,572237], 'Dresden':[517765,555351,559986],
+  'Nürnberg':[490085,510632,523734], 'Hannover':[509485,535932,516540], 'Duisburg':[487470,495152,501671],
+}; // [2011, 2021, 2022]
 
 const fmt = (n) => Math.round(n).toLocaleString('de-DE');
 const fmtM = (n) => (n / 1e6).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Mio.';
@@ -318,6 +548,7 @@ function renderSelection() {
     chart.setOption({ series: [{ id: 'states', data: stateData() }, { id: 'cities', data: cityData() }] });
   }
   renderStats();
+  if (window.Story) Story.sync();
 }
 
 function toggle(idx) {
@@ -419,8 +650,7 @@ chart.setOption({
   },
   geo: {
     map: 'germany',
-    roam: true,
-    scaleLimit: { min: 0.8, max: 6 },
+    roam: false, // Mausrad scrollt die Seite statt zu zoomen
     ...mapBox(),
     aspectScale: 0.65, // korrigiert die Verzerrung bei ~51° N
     selectedMode: false,
@@ -509,8 +739,300 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSelec
 
 window.addEventListener('resize', () => {
   chart.resize();
+  if (window.Story) Story.resize();
   chart.setOption({ geo: mapBox() });
 });
+
+/* ==================================================================
+ * 02 / ENTWICKLUNG — vier Grafiken, gekoppelt an dieselbe Auswahl
+ * ================================================================== */
+const Story = (() => {
+  const C = {
+    ember: '#C85A17', emberHot: '#F07A2E', cool: '#3D8FD6',
+    line: '#3A3A3A', grid: '#1C1C1C', axis: '#262626', ink: '#A3A3A3', inkMuted: '#737373', inkStrong: '#F5F5F5',
+    mono: 'JetBrains Mono', sans: 'Space Grotesk',
+  };
+  const names = CITIES.map((c) => c.name);
+  const isSel = (name) => selected.has(names.indexOf(name));
+  const anySel = () => selected.size > 0;
+  const fmtSigned = (x) => (x > 0 ? '+' : x < 0 ? '−' : '±') + Math.abs(x).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
+  const fmtTsd = (v) => (v >= 1000 ? (v / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' Mio.' : Math.round(v) + ' Tsd.');
+  const rate = (v0, v1, years) => (Math.pow(v1 / v0, 1 / years) - 1) * 100;
+
+  const tooltipBase = {
+    backgroundColor: '#141414', borderColor: '#333333', borderWidth: 1, borderRadius: 0, padding: [12, 14],
+    extraCssText: 'box-shadow:none;border-radius:0;', textStyle: { color: '#E5E5E5', fontFamily: C.sans }, appendTo: 'body',
+  };
+  const axisLabel = { color: C.inkMuted, fontFamily: C.mono, fontSize: 10 };
+  const row = (dot, label, value, strong) =>
+    `<div style="display:flex;justify-content:space-between;gap:18px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:${strong ? '#F5F5F5' : '#A3A3A3'}">
+       <span><i style="display:inline-block;width:8px;height:2px;background:${dot};margin-right:8px;vertical-align:middle"></i>${label}</span><span>${value}</span></div>`;
+  const tipHead = (eyebrow, title) =>
+    `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:${C.ember};margin-bottom:6px">${eyebrow}</div>
+     <div style="font-size:18px;font-weight:700;letter-spacing:-.04em;color:#F5F5F5;line-height:1;margin-bottom:8px">${title}</div>`;
+
+  /* ---------- Abgeleitete Daten ---------- */
+  const change2225 = CITIES.map((c) => ({ name: c.name, v: ((c.pop - EXACT[c.name][2]) / EXACT[c.name][2]) * 100 }))
+    .sort((a, b) => a.v - b.v);
+
+  const PERIODS = ['1960er', '1970er', '1980er', '1990er', '2000er', '2010er', '2020er'];
+  const heat = [];
+  CITIES.forEach((c, yi) => {
+    const a = SERIES[c.name].a; // Index: 1955=0, 1960=1, 1970=3, 1980=5, 1990=7, 2000=9, 2010=11
+    const e = EXACT[c.name];
+    const vals = [rate(a[1], a[3], 10), rate(a[3], a[5], 10), rate(a[5], a[7], 10), rate(a[7], a[9], 10),
+                  rate(a[9], a[11], 10), rate(e[0], e[1], 10), rate(e[2], c.pop, 3)];
+    vals.forEach((v, xi) => heat.push([xi, yi, +v.toFixed(2)]));
+  });
+
+  /* ---------- 01 Linien ---------- */
+  let line, bars, heatChart, tree, scale = 'value';
+  const GAP = '-';
+  function lineData(name) {
+    const s = SERIES[name];
+    return [
+      ...YEARS_A.map((y, i) => [y, s.a[i]]), [2010.5, GAP],
+      ...YEARS_B.map((y, i) => [y, s.b[i]]), [2021.5, GAP],
+      ...YEARS_C.map((y, i) => [y, s.c[i]]),
+    ];
+  }
+  function lineSeries() {
+    const sel = anySel();
+    return CITIES.map((c, i) => {
+      const on = isSel(c.name);
+      const showLabel = on || (!sel && c.pop >= 1_000_000);
+      return {
+        id: 'l-' + c.name, name: c.name, type: 'line', data: lineData(c.name),
+        showSymbol: false, symbolSize: 8, connectNulls: false, triggerLineEvent: true,
+        z: on ? 10 : 2,
+        lineStyle: { width: on ? 2.5 : 1.5, color: on ? C.ember : sel ? '#2A2A2A' : C.line },
+        itemStyle: { color: on ? C.ember : '#5A5A5A' },
+        emphasis: { focus: 'series', lineStyle: { width: 2.5, color: C.emberHot }, itemStyle: { color: C.emberHot } },
+        blur: { lineStyle: { opacity: 0.25 } },
+        endLabel: { show: showLabel, formatter: '{a}', color: on ? C.inkStrong : C.ink, fontFamily: C.mono, fontSize: 10, distance: 6 },
+        labelLayout: { moveOverlap: 'shiftY' },
+        markLine: i === 0 ? {
+          silent: true, symbol: 'none',
+          lineStyle: { color: '#525252', type: [4, 4], width: 1 },
+          label: { color: C.inkMuted, fontFamily: C.mono, fontSize: 10, position: 'insideEndTop', formatter: (p) => p.name },
+          data: [{ xAxis: 2011, name: "[ ZENSUS '11 ]" }, { xAxis: 2022, name: "[ ZENSUS '22 ]" }],
+        } : undefined,
+      };
+    });
+  }
+  function initLine() {
+    line = echarts.init(document.getElementById('chartLine'));
+    line.setOption({
+      animationDuration: 1600, animationEasing: 'cubicOut',
+      grid: { left: 64, right: 96, top: 24, bottom: 36 },
+      xAxis: { type: 'value', min: 1955, max: 2025, interval: 10, axisLabel: { ...axisLabel, formatter: (v) => String(v) },
+               axisLine: { lineStyle: { color: C.axis } }, axisTick: { show: false }, splitLine: { show: false } },
+      yAxis: { type: scale, min: scale === 'log' ? 400 : 0, logBase: 10, axisLabel: { ...axisLabel, formatter: fmtTsd },
+               splitLine: { lineStyle: { color: C.grid } }, axisLine: { show: false } },
+      tooltip: {
+        ...tooltipBase, trigger: 'axis',
+        axisPointer: { type: 'line', lineStyle: { color: '#525252', width: 1 } },
+        formatter: (ps) => {
+          const pts = ps.filter((p) => p.value && p.value[1] !== GAP);
+          if (!pts.length) return '';
+          const year = Math.round(pts[0].value[0]);
+          const basis = year >= 2022 ? 'Basis Zensus 2022' : year >= 2011 ? 'Basis Zensus 2011' : 'ältere Zählungen';
+          const sel = anySel();
+          const list = pts.sort((a, b) => b.value[1] - a.value[1])
+            .filter((p) => !sel || isSel(p.seriesName))
+            .map((p) => row(isSel(p.seriesName) ? C.ember : '#5A5A5A', p.seriesName, Math.round(p.value[1]).toLocaleString('de-DE') + ' Tsd.', isSel(p.seriesName)))
+            .join('');
+          const warn = year === 2011 || year === 2022
+            ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.ember};margin-top:8px">⚠ Statistische Korrektur (Zensus)</div>` : '';
+          return tipHead(basis, year) + list + warn;
+        },
+      },
+      series: lineSeries(),
+    });
+  }
+
+  /* ---------- 02 Divergierende Balken ---------- */
+  function barsOption() {
+    const sel = anySel();
+    return {
+      animationDuration: 1200, animationEasing: 'cubicOut',
+      grid: { left: 92, right: 64, top: 8, bottom: 28 },
+      xAxis: { type: 'value', axisLabel: { ...axisLabel, formatter: (v) => fmtSigned(v) }, splitLine: { lineStyle: { color: C.grid } }, axisLine: { show: false } },
+      yAxis: { type: 'category', data: change2225.map((d) => d.name), axisTick: { show: false },
+               axisLine: { lineStyle: { color: '#525252' } },
+               axisLabel: { fontFamily: C.mono, fontSize: 10, color: (n) => (isSel(n) ? C.inkStrong : C.ink) } },
+      tooltip: {
+        ...tooltipBase, trigger: 'item',
+        formatter: (p) => {
+          const c = CITIES.find((x) => x.name === p.name);
+          const v0 = EXACT[c.name][2];
+          return tipHead('2022 → 2025', c.name) +
+            row('#5A5A5A', '31.12.2022', v0.toLocaleString('de-DE')) +
+            row(C.ember, '31.12.2025', c.pop.toLocaleString('de-DE'), true) +
+            row(p.value >= 0 ? C.ember : C.cool, 'Veränderung', fmtSigned(p.value) + ' (' + (c.pop - v0 > 0 ? '+' : '−') + Math.abs(c.pop - v0).toLocaleString('de-DE') + ')', true);
+        },
+      },
+      series: [{
+        type: 'bar', barWidth: 10,
+        data: change2225.map((d) => ({
+          name: d.name, value: +d.v.toFixed(2),
+          itemStyle: { color: d.v >= 0 ? C.ember : C.cool, opacity: sel && !isSel(d.name) ? 0.3 : 1 },
+          label: { color: sel && !isSel(d.name) ? C.inkMuted : C.inkStrong },
+        })),
+        label: { show: true, position: 'right', formatter: (p) => fmtSigned(p.value), fontFamily: C.mono, fontSize: 10 },
+        emphasis: { itemStyle: { color: C.emberHot } },
+      }],
+    };
+  }
+  function initBars() {
+    bars = echarts.init(document.getElementById('chartBars'));
+    bars.setOption(barsOption());
+    bars.on('click', (p) => toggle(names.indexOf(p.name)));
+  }
+
+  /* ---------- 03 Heatmap ---------- */
+  function heatOption() {
+    const sel = anySel();
+    return {
+      animationDuration: 900,
+      grid: { left: 92, right: 8, top: 8, bottom: 40 },
+      xAxis: { type: 'category', data: PERIODS, position: 'bottom', axisTick: { show: false }, axisLine: { show: false },
+               axisLabel: { ...axisLabel }, splitArea: { show: false } },
+      yAxis: { type: 'category', data: names, inverse: true, axisTick: { show: false }, axisLine: { show: false },
+               axisLabel: { fontFamily: C.mono, fontSize: 10, color: (n) => (isSel(n) ? C.inkStrong : C.ink) } },
+      visualMap: { show: false, type: 'continuous', min: -2, max: 2, dimension: 2,
+                   inRange: { color: [C.cool, '#1E2A33', '#222222', '#3A2214', C.ember] } },
+      tooltip: {
+        ...tooltipBase, trigger: 'item',
+        formatter: (p) => {
+          const [xi, yi, v] = p.value;
+          const note = xi === 1 && (names[yi] === 'Köln' || names[yi] === 'Duisburg') ? '<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:#737373;margin-top:6px">Gebietsreform 1975 (Eingemeindungen)</div>' : '';
+          return tipHead(PERIODS[xi], names[yi]) + row(v >= 0 ? C.ember : C.cool, 'Ø pro Jahr', fmtSigned(v), true) + note;
+        },
+      },
+      series: [{
+        type: 'heatmap',
+        data: heat.map((d) => ({ value: d, itemStyle: { opacity: sel && !isSel(names[d[1]]) ? 0.3 : 1 } })),
+        itemStyle: { borderColor: '#0A0A0A', borderWidth: 2 },
+        label: { show: true, fontFamily: C.mono, fontSize: 9, color: '#D4D4D4',
+                 formatter: (p) => (p.value[2] > 0 ? '+' : '') + p.value[2].toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) },
+        emphasis: { itemStyle: { borderColor: '#F5F5F5', borderWidth: 1 } },
+      }],
+    };
+  }
+  function initHeat() {
+    heatChart = echarts.init(document.getElementById('chartHeat'));
+    heatChart.setOption(heatOption());
+    heatChart.on('click', (p) => toggle(p.value[1]));
+  }
+
+  /* ---------- 04 Treemap ---------- */
+  function treeData() {
+    const sel = anySel();
+    return Object.entries(STATES).sort((a, b) => b[1] - a[1]).map(([state, pop]) => {
+      const cities = CITIES.filter((c) => c.state === state);
+      const cityPop = cities.reduce((s, c) => s + c.pop, 0);
+      const children = cities.map((c) => ({
+        name: c.name, value: c.pop, kind: 'city', state,
+        itemStyle: { color: isSel(c.name) ? C.emberHot : sel ? '#4A2610' : C.ember },
+      }));
+      if (pop - cityPop > 1000) children.push({ name: 'Übriges Land', value: pop - cityPop, kind: 'rest', state, itemStyle: { color: '#1A1A1A' } });
+      return { name: state, value: pop, children };
+    });
+  }
+  function initTree() {
+    tree = echarts.init(document.getElementById('chartTree'));
+    tree.setOption({
+      animationDuration: 900,
+      tooltip: {
+        ...tooltipBase, trigger: 'item',
+        formatter: (p) => {
+          const d = p.data;
+          if (!d.kind) return tipHead('Bundesland', d.name) + row('#5A5A5A', 'Einwohner', d.value.toLocaleString('de-DE'), true) + row('#5A5A5A', 'Anteil an DE', fmtPct((d.value / DE_TOTAL) * 100));
+          const sp = STATES[d.state];
+          return tipHead(d.kind === 'city' ? 'Stadt / ' + d.state : d.state, d.name) +
+            row(d.kind === 'city' ? C.ember : '#5A5A5A', 'Einwohner', d.value.toLocaleString('de-DE'), true) +
+            row('#5A5A5A', 'Anteil am Land', fmtPct((d.value / sp) * 100)) +
+            row('#5A5A5A', 'Anteil an DE', fmtPct((d.value / DE_TOTAL) * 100)) +
+            (d.kind === 'city' ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#525252;margin-top:8px;text-transform:uppercase;letter-spacing:.15em">${isSel(d.name) ? 'Klick: abwählen' : 'Klick: auswählen'}</div>` : '');
+        },
+      },
+      series: [{
+        type: 'treemap', roam: false, nodeClick: false, breadcrumb: { show: false },
+        left: 0, right: 0, top: 0, bottom: 0, squareRatio: 1.2,
+        data: treeData(),
+        levels: [
+          { itemStyle: { borderColor: '#0A0A0A', borderWidth: 0, gapWidth: 3 } },
+          { itemStyle: { borderColor: '#262626', borderWidth: 1, gapWidth: 2, color: '#141414' },
+            upperLabel: { show: true, height: 22, color: '#A3A3A3', fontFamily: C.mono, fontSize: 10, padding: [0, 6] } },
+          { itemStyle: { borderWidth: 0, gapWidth: 0 } },
+        ],
+        label: {
+          show: true, fontFamily: C.sans, fontSize: 13, fontWeight: 700, color: '#F5F5F5', padding: 6,
+          formatter: (p) => (p.data.kind === 'rest' ? '{r|' + fmtPct((p.value / STATES[p.data.state]) * 100) + '}' : p.name + '\n{m|' + fmtPct((p.value / STATES[p.data.state]) * 100) + '}'),
+          rich: { m: { fontFamily: C.mono, fontSize: 10, fontWeight: 400, color: '#F5F5F5', padding: [4, 0, 0, 0] },
+                  r: { fontFamily: C.mono, fontSize: 10, color: '#525252' } },
+        },
+        emphasis: { itemStyle: { borderColor: '#F5F5F5', borderWidth: 1 } },
+      }],
+    });
+    tree.on('click', (p) => { if (p.data && p.data.kind === 'city') toggle(names.indexOf(p.data.name)); });
+  }
+
+  /* ---------- Auswahl-Leiste ---------- */
+  const chips = document.getElementById('pickChips');
+  const pickClear = document.getElementById('pickClear');
+  chips.innerHTML = CITIES.map((c, i) => `<button class="pick" data-idx="${i}" aria-pressed="false">${c.name}</button>`).join('');
+  chips.addEventListener('click', (e) => { const b = e.target.closest('.pick'); if (b) toggle(Number(b.dataset.idx)); });
+  pickClear.addEventListener('click', clearSelection);
+
+  document.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => {
+    scale = b.dataset.scale;
+    document.querySelectorAll('.seg-btn').forEach((x) => x.classList.toggle('is-on', x === b));
+    if (line) line.setOption({ yAxis: { type: scale, min: scale === 'log' ? 400 : 0 } });
+  }));
+
+  /* ---------- Tabelle ---------- */
+  const table = document.getElementById('dataTable');
+  table.innerHTML = '<thead><tr><th>Stadt</th><th>Land</th><th>1955</th><th>1990</th><th>2022</th><th>2025</th><th>Δ 2022–25</th><th>Anteil Land</th></tr></thead><tbody>' +
+    CITIES.map((c) => {
+      const s = SERIES[c.name], v22 = EXACT[c.name][2];
+      return `<tr><td>${c.name}</td><td>${c.state}</td><td>${(s.a[0] * 1000).toLocaleString('de-DE')}*</td><td>${(s.a[7] * 1000).toLocaleString('de-DE')}*</td>
+        <td>${v22.toLocaleString('de-DE')}</td><td>${c.pop.toLocaleString('de-DE')}</td><td>${fmtSigned(((c.pop - v22) / v22) * 100)}</td><td>${fmtPct((c.pop / STATES[c.state]) * 100)}</td></tr>`;
+    }).join('') + '</tbody><tfoot><tr><td colspan="8" style="color:#525252;text-align:left;padding-top:1rem">* auf Tausend gerundet</td></tr></tfoot>';
+
+  /* ---------- Lazy-Init beim Scrollen ---------- */
+  const inits = { line: initLine, bars: initBars, heat: initHeat, tree: initTree };
+  const panels = document.querySelectorAll('.story .panel, .story-head');
+  panels.forEach((p) => p.classList.add('reveal'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-in');
+      const k = en.target.dataset.chart;
+      if (k && inits[k]) { inits[k](); delete inits[k]; }
+      io.unobserve(en.target);
+    });
+  }, { threshold: 0.15 });
+  panels.forEach((p) => io.observe(p));
+
+  /* ---------- öffentliche API ---------- */
+  function sync() {
+    chips.querySelectorAll('.pick').forEach((b) => {
+      const on = selected.has(Number(b.dataset.idx));
+      b.classList.toggle('is-selected', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    pickClear.hidden = selected.size === 0;
+    if (line) line.setOption({ series: lineSeries() });
+    if (bars) bars.setOption(barsOption());
+    if (heatChart) heatChart.setOption(heatOption());
+    if (tree) tree.setOption({ series: [{ data: treeData() }] });
+  }
+  function resize() { [line, bars, heatChart, tree].forEach((c) => c && c.resize()); }
+  return { sync, resize };
+})();
+window.Story = Story;
 
 renderSelection();
 </script>
